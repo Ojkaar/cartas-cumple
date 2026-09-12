@@ -28,27 +28,8 @@
     console.warn('Firebase no inicializado aún:', err);
   }
 
-  // Datos iniciales de cumpleaños para Jenni
-  const INITIAL_ENVELOPES = [
-    {
-      id: 'carta-jenni-1',
-      author: 'De: Con Todo Nuestro Amor',
-      title: '🎂 ¡Feliz Cumpleaños Jenni! ✨',
-      content: '¡Hoy celebramos tu vida, Jenni! 💖\n\nCreamos este buzón interactivo para que todas las personas que te queremos podamos dejarte cartas, fotos y recuerdos especiales desde cualquier lugar.\n\n¡Abre los demás sobres para ver quién más te escribió o añade una nueva carta!',
-      images: [],
-      theme: 'rose',
-      updatedAt: Date.now()
-    },
-    {
-      id: 'carta-jenni-2',
-      author: 'De: Tus Amigos',
-      title: '📸 Nuestros Mejores Momentos',
-      content: '¡Gracias por tantas risas, salidas y momentos compartidos, Jenni!\n\nQue este nuevo año venga cargado de sueños cumplidos, viajes, felicidad y mucha salud.\n\n¡Te queremos muchísimo!',
-      images: [],
-      theme: 'mint',
-      updatedAt: Date.now() - 3600000
-    }
-  ];
+  // No hay sobres ficticios ni de prueba: el buzón empieza completamente limpio
+  const INITIAL_ENVELOPES = [];
 
   // Estado de la aplicación
   let envelopes = [];
