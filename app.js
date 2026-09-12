@@ -117,11 +117,8 @@
           list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
           envelopes = list;
         } else {
-          // Si la base de datos está vacía, inicializar con las cartas de bienvenida
-          INITIAL_ENVELOPES.forEach((env) => {
-            dbRef.child(env.id).set(env);
-          });
-          envelopes = INITIAL_ENVELOPES;
+          // Si la base de datos está vacía, no forzar recreación de sobres eliminados
+          envelopes = [];
         }
         persistEnvelopes();
         renderGrid();
@@ -364,17 +361,23 @@
     const confirmDelete = confirm('¿Estás seguro de que deseas eliminar este sobre?');
     if (!confirmDelete) return;
 
+    // Cancelar cualquier autoguardado pendiente para que no reviva el sobre
+    clearTimeout(saveTimeout);
+    saveTimeout = null;
+
+    const idToDelete = currentEnvelopeId;
+    currentEnvelopeId = null; // Anular de inmediato
+
     if (dbRef) {
-      dbRef.child(currentEnvelopeId).remove();
+      dbRef.child(idToDelete).remove();
     }
-    envelopes = envelopes.filter((e) => e.id !== currentEnvelopeId);
+    envelopes = envelopes.filter((e) => e.id !== idToDelete);
     persistEnvelopes();
 
     noteModal.classList.remove('active');
     noteModal.setAttribute('aria-hidden', 'true');
 
     setTimeout(() => {
-      currentEnvelopeId = null;
       renderGrid();
     }, 350);
   }
