@@ -419,8 +419,7 @@ body {
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(30, 24, 18, 0.65);
-  backdrop-filter: blur(8px);
+  background: rgba(30, 24, 18, 0.78);
 }
 
 /* Escenario donde conviven el sobre y la carta saliendo */
@@ -476,7 +475,7 @@ body {
   transform: rotateX(0deg);
   z-index: 15;
   transition: transform 0.75s cubic-bezier(0.34, 1.25, 0.64, 1), z-index 0.3s ease;
-  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.2));
+  will-change: transform;
 }
 
 /* Cuando el modal está activo, la solapa gira 180 grados hacia atrás */
@@ -524,7 +523,6 @@ body {
   background: 
     linear-gradient(to top right, var(--envelope-bg) 50%, transparent 50%) left bottom / 50% 100% no-repeat,
     linear-gradient(to top left, var(--envelope-bg) 50%, transparent 50%) right bottom / 50% 100% no-repeat;
-  filter: drop-shadow(0 -2px 6px rgba(0, 0, 0, 0.08));
 }
 
 .env-front-folds {
@@ -563,6 +561,7 @@ body {
   transform: translateY(90px) scale(0.85);
   opacity: 0;
   transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.18s, opacity 0.5s ease 0.15s;
+  will-change: transform, opacity;
 }
 
 .note-modal-overlay.active .notepad-sheet {

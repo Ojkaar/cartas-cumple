@@ -157,9 +157,17 @@
   // -------------------------------------------------------------------------
   // Renderizado de la Cuadrícula de Sobres
   // -------------------------------------------------------------------------
+  let renderGridTimer = null;
   function renderGrid() {
-    gridEl.innerHTML = '';
+    if (renderGridTimer) return; // ya hay un render pendiente, no duplicar
+    renderGridTimer = requestAnimationFrame(() => {
+      renderGridTimer = null;
+      _doRenderGrid();
+    });
+  }
 
+  function _doRenderGrid() {
+    gridEl.innerHTML = '';
     if (envelopes.length === 0) {
       const emptyDiv = document.createElement('div');
       emptyDiv.className = 'empty-state';
