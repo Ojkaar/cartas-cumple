@@ -6,7 +6,7 @@
   'use strict';
 
   // Constantes y claves de almacenamiento
-  const STORAGE_KEY = 'magic_envelopes_notes_v1';
+  const STORAGE_KEY = 'magic_envelopes_cartas_v2';
   
   const COLOR_NAMES = {
     kraft: 'Papel Craft',
@@ -22,7 +22,7 @@
   let dbRef = null;
   try {
     if (typeof firebase !== 'undefined' && firebase.database) {
-      dbRef = firebase.database().ref('cartas_jenni');
+      dbRef = firebase.database().ref('cartas');
     }
   } catch (err) {
     console.warn('Firebase no inicializado aún:', err);
