@@ -1,0 +1,10 @@
+# Node
+node_modules/
+.npm/
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+.DS_Store

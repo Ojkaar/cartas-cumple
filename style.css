@@ -1,0 +1,1393 @@
+/* ==========================================================================
+   BUZÓN MÁGICO - ESTILOS VISUALES Y ANIMACIONES 3D
+   ========================================================================== */
+
+:root {
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-hand: 'Caveat', cursive, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+
+  /* Colores por defecto del sobre (Kraft) */
+  --envelope-bg: #ddbf96;
+  --envelope-dark: #caa87c;
+  --envelope-interior: #b99363;
+  --envelope-shadow: rgba(84, 53, 21, 0.25);
+  --seal-color: #b32d2e;
+  --seal-shadow: rgba(120, 20, 20, 0.4);
+
+  /* Hoja de papel */
+  --paper-bg: #fffdf9;
+  --paper-lines: #ebd8c3;
+  --paper-margin: #f7a8a8;
+  --text-main: #2d2a26;
+  --text-muted: #7d756d;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f3efe9;
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --------------------------------------------------------------------------
+   Fondo del escritorio (Desk)
+   -------------------------------------------------------------------------- */
+.desk-background {
+  min-height: 100vh;
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.7) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(210, 180, 140, 0.25) 0%, transparent 50%),
+    linear-gradient(135deg, #e7decb 0%, #d8caa7 50%, #cbb991 100%);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.desk-background::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   Encabezado
+   -------------------------------------------------------------------------- */
+.app-header {
+  position: relative;
+  z-index: 10;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stamp-icon {
+  font-size: 2.2rem;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  border: 2px dashed #caa87c;
+  transform: rotate(-3deg);
+  transition: transform 0.3s ease;
+}
+
+.stamp-icon:hover {
+  transform: rotate(4deg) scale(1.05);
+}
+
+.logo-area h1 {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2b241d;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.15rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #3d352e 0%, #25201b 100%);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.4rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(37, 32, 27, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 32, 27, 0.35);
+  background: linear-gradient(135deg, #4d443b 0%, #2e2822 100%);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   Mesa de Sobres (Grid)
+   -------------------------------------------------------------------------- */
+.desk-main {
+  flex: 1;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.envelopes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2.8rem;
+  justify-items: center;
+  perspective: 1000px;
+}
+
+/* --------------------------------------------------------------------------
+   Tarjeta de Sobre en la Cuadrícula
+   -------------------------------------------------------------------------- */
+.envelope-item {
+  width: 100%;
+  max-width: 320px;
+  height: 220px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.envelope-item:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.envelope-item:focus-visible {
+  outline: 3px solid #7c6248;
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+
+.envelope-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 
+    0 12px 28px rgba(50, 30, 10, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.06);
+  background-color: var(--envelope-bg, #ddbf96);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.35s ease;
+}
+
+.envelope-item:hover .envelope-card {
+  box-shadow: 
+    0 20px 38px rgba(50, 30, 10, 0.22),
+    0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Solapa superior cerrada en la cuadrícula */
+.card-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 110px;
+  background: linear-gradient(to bottom, var(--envelope-dark, #caa87c), var(--envelope-bg, #ddbf96));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  z-index: 3;
+  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.12));
+  transition: transform 0.4s ease;
+}
+
+.envelope-item:hover .card-flap {
+  transform: translateY(-3px);
+}
+
+/* Sello de cera en la tarjeta */
+.card-wax-seal {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 38px;
+  height: 38px;
+  background: radial-gradient(circle at 35% 35%, #d94747, var(--seal-color, #931d1e));
+  border-radius: 50%;
+  box-shadow: 
+    0 3px 8px rgba(0, 0, 0, 0.35),
+    inset 0 2px 3px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.card-seal-icon {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Bolsillo frontal y detalles */
+.card-pocket {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: 
+    linear-gradient(to top, rgba(0,0,0,0.12) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+}
+
+/* Falsos pliegues en sobre */
+.card-pocket::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(to top right, var(--envelope-dark, #caa87c) 50%, transparent 50%) left bottom / 50% 100% no-repeat,
+    linear-gradient(to top left, var(--envelope-dark, #caa87c) 50%, transparent 50%) right bottom / 50% 100% no-repeat;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* Estampilla vintage */
+.card-stamp {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 52px;
+  background: #fcf8f0;
+  border: 1.5px dashed #bba895;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  transform: rotate(3deg);
+  z-index: 4;
+}
+
+.stamp-inner {
+  font-family: var(--font-sans);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #a43a3a;
+  border: 1px solid #a43a3a;
+  padding: 2px 4px;
+  text-align: center;
+}
+
+/* Etiqueta de la nota en el sobre */
+.card-label {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid var(--envelope-dark, #caa87c);
+  z-index: 4;
+}
+
+.card-title {
+  font-family: var(--font-hand);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #2b251f;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-date {
+  font-size: 0.75rem;
+  color: #8c8278;
+  margin-top: 0.2rem;
+}
+
+.card-preview-count {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 4;
+}
+
+.image-count-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+
+/* Estado de lista vacía */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  border: 2px dashed #cfbeaa;
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+.empty-state-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: #3b3127;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #7a7065;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   MODAL DE APERTURA 3D Y BLOC DE NOTAS
+   ========================================================================== */
+.note-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  perspective: 1500px;
+}
+
+.note-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 24, 18, 0.65);
+  backdrop-filter: blur(8px);
+}
+
+/* Escenario donde conviven el sobre y la carta saliendo */
+.opened-envelope-stage {
+  position: relative;
+  width: 92%;
+  max-width: 720px;
+  height: 88vh;
+  max-height: 820px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+
+/* --------------------------------------------------------------------------
+   El Sobre 3D en el fondo del modal
+   -------------------------------------------------------------------------- */
+.envelope-3d-model {
+  position: absolute;
+  bottom: -40px;
+  width: 480px;
+  height: 310px;
+  background-color: var(--envelope-bg);
+  border-radius: 12px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+  transform-style: preserve-3d;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* Fondo interior del sobre */
+.env-back {
+  position: absolute;
+  inset: 0;
+  background-color: var(--envelope-interior);
+  border-radius: 12px;
+  z-index: 1;
+  box-shadow: inset 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Solapa triangular superior animada en 3D */
+.env-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 170px;
+  background: linear-gradient(to bottom, var(--envelope-dark), var(--envelope-bg));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transform: rotateX(0deg);
+  z-index: 15;
+  transition: transform 0.75s cubic-bezier(0.34, 1.25, 0.64, 1), z-index 0.3s ease;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.2));
+}
+
+/* Cuando el modal está activo, la solapa gira 180 grados hacia atrás */
+.note-modal-overlay.active .env-flap {
+  transform: rotateX(180deg);
+  z-index: 0; /* Pasa detrás de la carta una vez abierta */
+}
+
+/* Sello de cera en la solapa */
+.wax-seal {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(circle at 35% 35%, #e64040, var(--seal-color, #9c1f20));
+  border-radius: 50%;
+  box-shadow: 
+    0 4px 12px var(--seal-shadow),
+    inset 0 3px 4px rgba(255, 255, 255, 0.35),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: opacity 0.4s ease, transform 0.5s ease;
+}
+
+.note-modal-overlay.active .wax-seal {
+  transform: translate(-50%, 50%) scale(0.9);
+}
+
+/* Bolsillo frontal del sobre */
+.env-pocket {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8;
+  pointer-events: none;
+  background: 
+    linear-gradient(to top right, var(--envelope-bg) 50%, transparent 50%) left bottom / 50% 100% no-repeat,
+    linear-gradient(to top left, var(--envelope-bg) 50%, transparent 50%) right bottom / 50% 100% no-repeat;
+  filter: drop-shadow(0 -2px 6px rgba(0, 0, 0, 0.08));
+}
+
+.env-front-folds {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9;
+  background: linear-gradient(to top, var(--envelope-dark) 0%, transparent 35%);
+  opacity: 0.4;
+  border-radius: 0 0 12px 12px;
+}
+
+/* --------------------------------------------------------------------------
+   El Bloc de Notas (Hoja que sale del sobre)
+   -------------------------------------------------------------------------- */
+.notepad-sheet {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  max-width: 650px;
+  height: 90%;
+  max-height: 750px;
+  background-color: var(--paper-bg);
+  border-radius: 16px;
+  box-shadow: 
+    0 25px 60px rgba(0, 0, 0, 0.35),
+    0 5px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #ebd8c3;
+
+  /* Animación de emergencia desde dentro del sobre */
+  transform: translateY(90px) scale(0.85);
+  opacity: 0;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.18s, opacity 0.5s ease 0.15s;
+}
+
+.note-modal-overlay.active .notepad-sheet {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Detalles de libreta / encuadernación */
+.notepad-header-binding {
+  height: 28px;
+  background: linear-gradient(to bottom, #f0e6d6, #e7dcce);
+  border-bottom: 2px dashed #cca87e;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tape-strip {
+  position: absolute;
+  top: -6px;
+  width: 110px;
+  height: 20px;
+  background: rgba(255, 238, 179, 0.65);
+  border: 1px dashed rgba(212, 185, 114, 0.6);
+  transform: rotate(-1.5deg);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+
+.binding-holes {
+  display: flex;
+  gap: 32px;
+}
+
+.binding-holes span {
+  width: 8px;
+  height: 8px;
+  background: #463b31;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.6);
+}
+
+/* Contenedor principal de la hoja */
+.notepad-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background-color: var(--paper-bg);
+  /* Textura de papel */
+  background-image: 
+    radial-gradient(var(--paper-lines) 0.75px, transparent 0.75px);
+  background-size: 20px 20px;
+}
+
+/* Barra de herramientas interna */
+.notepad-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #edd5be;
+}
+
+.notepad-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.date-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #796652;
+  background: #f1e4d3;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.tag-badge {
+  font-size: 0.75rem;
+  color: #947e68;
+  font-style: italic;
+}
+
+.toolbar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f5ece0;
+  border: 1px solid #dfcfbc;
+  color: #4b3d30;
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+  background: #ebd8c3;
+  color: #231b14;
+}
+
+.image-upload-btn {
+  background: #faeedb;
+  border-color: #d6bda2;
+  color: #724c1f;
+  font-weight: 600;
+}
+
+.image-upload-btn:hover {
+  background: #f5dfbe;
+}
+
+.btn-danger-icon {
+  padding: 0.45rem 0.6rem;
+  color: #b54040;
+}
+
+.btn-danger-icon:hover {
+  background: #ffe3e3;
+  border-color: #f7a8a8;
+  color: #9c1f20;
+}
+
+.btn-close {
+  padding: 0.45rem 0.6rem;
+  background: #f0e6d9;
+}
+
+/* Selector de color desplegable */
+.color-picker-wrapper {
+  position: relative;
+}
+
+.color-dropdown-btn {
+  padding: 0.45rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--envelope-bg);
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+.color-palette-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background: #fff;
+  border: 1px solid #decbbe;
+  border-radius: 12px;
+  padding: 0.6rem;
+  display: none;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  z-index: 50;
+}
+
+.color-palette-popover.show {
+  display: grid;
+}
+
+.palette-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--c);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.palette-option:hover {
+  transform: scale(1.2);
+  border-color: #3b3127;
+}
+
+/* --------------------------------------------------------------------------
+   Campos de Texto y Bloc Rayado
+   -------------------------------------------------------------------------- */
+.notepad-title-box {
+  border-bottom: 2px solid #e2cbb1;
+  padding-bottom: 0.3rem;
+}
+
+.note-title-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-hand);
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #2b231a;
+  line-height: 1.2;
+}
+
+.note-title-input::placeholder {
+  color: #bfa993;
+  font-style: italic;
+}
+
+/* Contenedor de papel rayado */
+.notepad-body-wrapper {
+  flex: 1;
+  min-height: 220px;
+  display: flex;
+}
+
+.notepad-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  font-family: var(--font-hand);
+  font-size: 1.45rem;
+  line-height: 32px;
+  color: #31281e;
+  /* Líneas horizontales de cuaderno */
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    #e8d7c4 31px,
+    #e8d7c4 32px
+  );
+  background-attachment: local;
+  padding: 0 0.5rem;
+}
+
+.notepad-textarea::placeholder {
+  color: #c4b09b;
+  font-size: 1.3rem;
+}
+
+/* --------------------------------------------------------------------------
+   Área de Imágenes y Polaroids
+   -------------------------------------------------------------------------- */
+.drop-hint-bar {
+  background: #fbf5eb;
+  border: 1px dashed #d6bfa3;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.82rem;
+  color: #8c765f;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.drop-hint-bar.drag-over {
+  background: #ffeac7;
+  border-color: #b87a28;
+  color: #5c3c0f;
+  transform: scale(1.01);
+}
+
+.notepad-images-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  padding: 0.5rem 0;
+}
+
+.polaroid-card {
+  position: relative;
+  background: #fff;
+  padding: 8px 8px 18px 8px;
+  border-radius: 4px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ebd9c8;
+  max-width: 170px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: zoom-in;
+}
+
+.polaroid-card:hover {
+  transform: scale(1.04) rotate(0deg) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  z-index: 10;
+}
+
+/* Cinta adhesiva washi tape arriba de cada polaroid */
+.polaroid-card::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 16px;
+  background: rgba(230, 215, 175, 0.7);
+  border: 1px dashed rgba(190, 165, 110, 0.4);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.polaroid-img-wrapper {
+  width: 154px;
+  height: 120px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #f5f0e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.polaroid-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.btn-remove-image {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  background: #c93b3b;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.polaroid-card:hover .btn-remove-image {
+  opacity: 1;
+}
+
+.btn-remove-image:hover {
+  transform: scale(1.15);
+  background: #a32424;
+}
+
+/* --------------------------------------------------------------------------
+   Pie de Hoja
+   -------------------------------------------------------------------------- */
+.notepad-footer {
+  padding: 0.9rem 2rem;
+  background: #f7ede0;
+  border-top: 1px solid #ebd8c3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #60795c;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.btn-primary-small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #3c3227;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-small:hover {
+  background: #231c15;
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   Visor de Imagen Completa (Zoom)
+   -------------------------------------------------------------------------- */
+.image-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 12, 10, 0.88);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.image-viewer-overlay.active {
+  display: flex;
+}
+
+.image-viewer-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.image-viewer-content img {
+  max-width: 100%;
+  max-height: 85vh;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  border: 4px solid #fff;
+}
+
+.btn-close-viewer {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* --------------------------------------------------------------------------
+   Temas de Colores para los Sobres
+   -------------------------------------------------------------------------- */
+.theme-kraft {
+  --envelope-bg: #ddbf96;
+  --envelope-dark: #caa87c;
+  --envelope-interior: #b99363;
+  --seal-color: #a82e2e;
+}
+
+.theme-rose {
+  --envelope-bg: #f8ccd2;
+  --envelope-dark: #e8b2b9;
+  --envelope-interior: #d89aa3;
+  --seal-color: #8c2e4b;
+}
+
+.theme-lavender {
+  --envelope-bg: #d7cdfc;
+  --envelope-dark: #c2b5f0;
+  --envelope-interior: #a797e0;
+  --seal-color: #4b367c;
+}
+
+.theme-mint {
+  --envelope-bg: #c1ebd5;
+  --envelope-dark: #a5dac0;
+  --envelope-interior: #87c5a7;
+  --seal-color: #246b4e;
+}
+
+.theme-sky {
+  --envelope-bg: #c3e2fa;
+  --envelope-dark: #a9cfed;
+  --envelope-interior: #87b5db;
+  --seal-color: #275279;
+}
+
+.theme-terracotta {
+  --envelope-bg: #f2ae94;
+  --envelope-dark: #e0967a;
+  --envelope-interior: #c77b5d;
+  --seal-color: #8a361b;
+}
+
+.theme-noir {
+  --envelope-bg: #43444e;
+  --envelope-dark: #32333b;
+  --envelope-interior: #24252a;
+  --seal-color: #c99a38;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .app-header {
+    padding: 1rem;
+  }
+  
+  .desk-main {
+    padding: 1.5rem 1rem;
+  }
+
+  .envelope-3d-model {
+    width: 320px;
+    height: 220px;
+    bottom: -20px;
+  }
+
+  .notepad-sheet {
+    max-height: 95vh;
+  }
+
+  .notepad-content {
+    padding: 1rem;
+  }
+
+  .note-title-input {
+    font-size: 1.6rem;
+  }
+
+  .notepad-textarea {
+    font-size: 1.25rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Botón Secundario y Modal de Compartir
+   -------------------------------------------------------------------------- */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  color: #3b3127;
+  border: 1px solid #d4c1ad;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-secondary:hover {
+  background: #fbf5ee;
+  border-color: #bfa58c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
+}
+
+.share-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.share-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.share-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 16, 12, 0.65);
+  backdrop-filter: blur(8px);
+}
+
+.share-modal-card {
+  position: relative;
+  z-index: 10;
+  width: 90%;
+  max-width: 560px;
+  background: #fffdf9;
+  border-radius: 20px;
+  padding: 2rem 2.2rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid #edd5be;
+  transform: scale(0.92);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.share-modal-overlay.active .share-modal-card {
+  transform: scale(1);
+}
+
+.share-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.share-badge {
+  background: #ffe3e3;
+  color: #a82e2e;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #f7c3c3;
+}
+
+.btn-close-share {
+  width: 32px;
+  height: 32px;
+  background: #f3eae0;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #554433;
+  transition: all 0.2s ease;
+}
+
+.btn-close-share:hover {
+  background: #e4d3c3;
+  color: #111;
+}
+
+.share-modal-card h2 {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  color: #2c2218;
+  margin-bottom: 0.4rem;
+}
+
+.share-desc {
+  font-size: 0.92rem;
+  color: #796c5f;
+  line-height: 1.45;
+  margin-bottom: 1.5rem;
+}
+
+.share-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.share-step {
+  display: flex;
+  gap: 1rem;
+  background: #fbf7f0;
+  border: 1px solid #ebdecb;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+}
+
+.step-num {
+  width: 30px;
+  height: 30px;
+  background: #3b3025;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.step-body h4 {
+  font-size: 1rem;
+  color: #2a2016;
+  margin-bottom: 0.25rem;
+}
+
+.step-body p {
+  font-size: 0.86rem;
+  color: #695e52;
+  line-height: 1.4;
+  margin-bottom: 0.35rem;
+}
+
+.step-body a {
+  color: #a82e2e;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.step-body code {
+  background: #eedfcb;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #3b2a1a;
+}
+
+.step-actions {
+  margin-top: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.save-web-feedback {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #3e814a;
+}
+
+.share-tips {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #d9c7b2;
+  font-size: 0.88rem;
+  color: #796652;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Indicador de Firebase en Vivo y Campo de Autor
+   -------------------------------------------------------------------------- */
+.cloud-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(46, 125, 50, 0.12);
+  border: 1px solid rgba(46, 125, 50, 0.3);
+  color: #2e7d32;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #2e7d32;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7);
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 7px rgba(46, 125, 50, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 125, 50, 0);
+  }
+}
+
+.author-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.author-badge-icon {
+  font-size: 1.1rem;
+}
+
+.note-author-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #a82e2e;
+  border-bottom: 1.5px dashed #ebd8c3;
+  padding-bottom: 0.2rem;
+  transition: border-color 0.2s ease;
+}
+
+.note-author-input:focus {
+  border-bottom-color: #a82e2e;
+}
+
+.note-author-input::placeholder {
+  color: #c4b09b;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.card-author {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #a82e2e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

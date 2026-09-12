@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buzón Mágico - Bloc de Notas en Sobres</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Fondo con ambientación de escritorio -->
+  <div class="desk-background">
+    <header class="app-header">
+      <div class="header-content">
+        <div class="logo-area">
+          <div class="stamp-icon">🎂</div>
+          <div>
+            <h1>Cartas para Jenni ✉️✨</h1>
+            <p class="subtitle">Buzón de cumpleaños • Escribe una carta o sube fotos para Jenni</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <div class="cloud-status" id="cloud-status" title="Conectado a Firebase en tiempo real">
+            <span class="pulse-dot"></span>
+            <span class="status-text">Buzón en Vivo</span>
+          </div>
+          <button id="btn-share-guide" class="btn-secondary" title="Cómo publicar y compartir tus cartas para el cumpleaños">
+            <span>🎈</span>
+            <span>Compartir Enlace</span>
+          </button>
+          <button id="btn-new-envelope" class="btn-primary" title="Escribir una nueva carta para Jenni">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ Escribir Carta</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenedor principal de la cuadrícula de sobres -->
+    <main class="desk-main">
+      <div id="envelopes-grid" class="envelopes-grid">
+        <!-- Los sobres se renderizan dinámicamente aquí -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal / Overlay de la Carta y Bloc de Notas abierta -->
+  <div id="note-modal" class="note-modal-overlay" aria-hidden="true">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    
+    <div class="opened-envelope-stage">
+      <!-- El sobre que se queda en el fondo y se abre -->
+      <div id="modal-envelope-container" class="envelope-3d-model">
+        <div class="env-back"></div>
+        <div class="env-flap" id="modal-env-flap">
+          <div class="wax-seal" id="modal-wax-seal">
+            <span class="seal-mark">✦</span>
+          </div>
+        </div>
+        <div class="env-pocket"></div>
+        <div class="env-front-folds"></div>
+      </div>
+
+      <!-- El Bloc de Notas que se desliza fuera del sobre -->
+      <div id="notepad-sheet" class="notepad-sheet">
+        <!-- Barra de sujeción / Espiral de bloc de notas -->
+        <div class="notepad-header-binding">
+          <div class="tape-strip"></div>
+          <div class="binding-holes">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <!-- Contenido del Bloc de Notas -->
+        <div class="notepad-content">
+          <!-- Barra de herramientas superior de la nota -->
+          <div class="notepad-toolbar">
+            <div class="notepad-meta">
+              <span class="date-badge" id="note-date-display">12 Sep 2026</span>
+              <span class="tag-badge" id="note-color-badge">Sobre Kraft</span>
+            </div>
+            
+            <div class="toolbar-buttons">
+              <!-- Botón para subir imágenes -->
+              <label class="tool-btn image-upload-btn" title="Adjuntar imagen (o pega con Ctrl+V)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span>Añadir Imagen</span>
+                <input type="file" id="image-file-input" accept="image/*" multiple hidden>
+              </label>
+
+              <!-- Color del sobre -->
+              <div class="color-picker-wrapper" title="Color del sobre">
+                <button type="button" class="tool-btn color-dropdown-btn" id="color-dropdown-btn">
+                  <span class="color-dot" id="current-color-dot"></span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="color-palette-popover" id="color-palette-popover">
+                  <button type="button" class="palette-option" data-color="kraft" style="--c: #d8be9b" title="Papel Craft"></button>
+                  <button type="button" class="palette-option" data-color="rose" style="--c: #f3c2c2" title="Rosa Pastel"></button>
+                  <button type="button" class="palette-option" data-color="lavender" style="--c: #cfc5f5" title="Lavanda"></button>
+                  <button type="button" class="palette-option" data-color="mint" style="--c: #b8e2ce" title="Menta Suave"></button>
+                  <button type="button" class="palette-option" data-color="sky" style="--c: #badcf6" title="Azul Cielo"></button>
+                  <button type="button" class="palette-option" data-color="terracotta" style="--c: #e8a58a" title="Terracota"></button>
+                  <button type="button" class="palette-option" data-color="noir" style="--c: #3d3b45" title="Gris Carbón"></button>
+                </div>
+              </div>
+
+              <!-- Eliminar sobre -->
+              <button id="btn-delete-note" class="tool-btn btn-danger-icon" title="Eliminar sobre y nota">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+
+              <!-- Cerrar nota y guardar -->
+              <button id="btn-close-note" class="tool-btn btn-close" title="Guardar y guardar en sobre">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Título y Autor editables -->
+          <div class="notepad-title-box">
+            <div class="author-input-row">
+              <span class="author-badge-icon">✍️</span>
+              <input type="text" id="note-author-input" class="note-author-input" placeholder="Tu nombre (ej. De: Sofía, Tía Carmen...)" maxlength="40">
+            </div>
+            <input type="text" id="note-title-input" class="note-title-input" placeholder="Título de tu mensaje o recuerdo..." maxlength="60">
+          </div>
+
+          <!-- Área de imágenes adjuntas / polaroids -->
+          <div id="images-container" class="notepad-images-grid">
+            <!-- Miniaturas de fotos insertadas -->
+          </div>
+
+          <!-- Indicador de zona para arrastrar o pegar imagen -->
+          <div id="drop-hint-bar" class="drop-hint-bar">
+            <span>💡 Puedes arrastrar imágenes aquí o pulsar <b>Ctrl + V</b> para pegarlas</span>
+          </div>
+
+          <!-- Cuerpo de texto (Bloc de notas rayado) -->
+          <div class="notepad-body-wrapper">
+            <textarea id="note-text-input" class="notepad-textarea" placeholder="Escribe aquí tus pensamientos, recuerdos, ideas, listas de tareas..."></textarea>
+          </div>
+        </div>
+
+        <!-- Pie de la hoja con estado de guardado y botón cerrar -->
+        <div class="notepad-footer">
+          <span class="save-status" id="save-status">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Guardado automáticamente
+          </span>
+          <button id="btn-done-note" class="btn-primary-small">
+            <span>Cerrar y guardar en sobre</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para ver imagen ampliada / zoom -->
+  <div id="image-viewer-modal" class="image-viewer-overlay">
+    <div class="image-viewer-content">
+      <button id="btn-close-image-viewer" class="btn-close-viewer">✕</button>
+      <img id="image-viewer-img" src="" alt="Imagen ampliada">
+    </div>
+  </div>
+
+  <!-- Plantilla oculta para crear tarjetas de sobres en la cuadrícula -->
+  <template id="envelope-card-template">
+    <div class="envelope-item" tabindex="0" role="button">
+      <div class="envelope-card">
+        <!-- Solapa del sobre -->
+        <div class="card-flap">
+          <div class="card-wax-seal">
+            <span class="card-seal-icon">✦</span>
+          </div>
+        </div>
+        <!-- Bolsillo del sobre -->
+        <div class="card-pocket">
+          <div class="card-stamp">
+            <span class="stamp-inner">CORREO</span>
+          </div>
+          <div class="card-label">
+            <div class="card-author">De: Amigo</div>
+            <div class="card-title">Título del sobre</div>
+            <div class="card-date">Fecha</div>
+          </div>
+          <div class="card-preview-count">
+            <span class="image-count-tag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span class="img-num">0</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Modal de Guía para Compartir y Publicar en Internet -->
+  <div id="share-modal" class="share-modal-overlay" aria-hidden="true">
+    <div class="share-modal-backdrop" id="share-modal-backdrop"></div>
+    <div class="share-modal-card">
+      <div class="share-modal-header">
+        <div class="share-badge">🎂 Especial Cumpleaños</div>
+        <button id="btn-close-share" class="btn-close-share" title="Cerrar">✕</button>
+      </div>
+      <h2>¿Cómo compartir tus cartas en Internet?</h2>
+      <p class="share-desc">Sigue estos dos sencillos pasos para que el cumpleañero/a pueda abrir sus cartas interactivas desde su celular o computadora:</p>
+
+      <div class="share-steps">
+        <div class="share-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Guardar tus cartas para la web</h4>
+            <p>Guarda tus textos, títulos y fotos para que queden grabados en el proyecto y no solo en tu navegador actual.</p>
+            <div class="step-actions">
+              <button id="btn-save-web-letters" class="btn-primary-small">
+                <span>💾 Guardar cartas actuales para la Web</span>
+              </button>
+              <span id="save-web-feedback" class="save-web-feedback"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="share-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Publicar gratis en 30 segundos (Netlify Drop)</h4>
+            <p>1. Entra a <a href="https://app.netlify.com/drop" target="_blank" rel="noopener noreferrer">app.netlify.com/drop</a> en tu navegador.</p>
+            <p>2. Arrastra tu carpeta <b>12</b> del escritorio a esa página.</p>
+            <p>3. ¡Listo! Te dará un enlace como <code>https://cartas-cumple.netlify.app</code> que puedes enviar por WhatsApp.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="share-tips">
+        <span>🎉 <b>Efecto festivo activado:</b> Al abrir cada sobre caerá confeti de fiesta.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs (Realtime Database en vivo) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <!-- Librería de Confetti para celebraciones -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

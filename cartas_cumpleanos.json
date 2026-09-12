@@ -1,0 +1,26 @@
+[
+  {
+    "id": "cumple-1",
+    "title": "🎉 ¡Feliz Cumpleaños!",
+    "content": "¡Hoy es un día muy especial!\n\nQuería darte esta sorpresa de una forma diferente y mágica. Cada uno de estos sobres guarda recuerdos, fotos y mensajes hechos con mucho cariño para ti.\n\n¡Haz clic en los demás sobres para descubrirlos!",
+    "images": [],
+    "theme": "rose",
+    "updatedAt": 1725890000000
+  },
+  {
+    "id": "cumple-2",
+    "title": "📸 Nuestros Mejores Recuerdos",
+    "content": "Gracias por todos los momentos increíbles que hemos compartido juntos, por las risas interminables y por estar siempre ahí.\n\n¡Que este nuevo año de vida venga cargado de sueños cumplidos y muchísima felicidad!",
+    "images": [],
+    "theme": "mint",
+    "updatedAt": 1725891000000
+  },
+  {
+    "id": "cumple-3",
+    "title": "✨ Deseos para tu Nuevo Año",
+    "content": "Para este nuevo año te deseo:\n• Mucha salud y energía positiva\n• Nuevos viajes y aventuras\n• Sonrisas todos los días\n• Que alcances cada una de tus metas\n\n¡Te quiero muchísimo!",
+    "images": [],
+    "theme": "kraft",
+    "updatedAt": 1725892000000
+  }
+]
