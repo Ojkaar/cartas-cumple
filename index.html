@@ -90,6 +90,21 @@
                 <input type="file" id="image-file-input" accept="image/*" multiple hidden>
               </label>
 
+              <!-- Botón para añadir enlace -->
+              <button type="button" class="tool-btn link-upload-btn" id="btn-add-link" title="Añadir enlace web (canción, video, etc.)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <span>Añadir Enlace</span>
+              </button>
+
+              <!-- Alternar modo lectura con enlaces activos -->
+              <button type="button" class="tool-btn view-toggle-btn" id="btn-toggle-view" title="Alternar entre modo lectura y edición">
+                <span id="view-toggle-icon">👁️</span>
+                <span id="view-toggle-text">Leer</span>
+              </button>
+
               <!-- Color del sobre -->
               <div class="color-picker-wrapper" title="Color del sobre">
                 <button type="button" class="tool-btn color-dropdown-btn" id="color-dropdown-btn">
@@ -147,6 +162,16 @@
           <!-- Cuerpo de texto (Bloc de notas rayado) -->
           <div class="notepad-body-wrapper">
             <textarea id="note-text-input" class="notepad-textarea" placeholder="Escribe aquí tus pensamientos, recuerdos, ideas, listas de tareas..."></textarea>
+            <div id="note-text-display" class="notepad-formatted-view" style="display: none;"></div>
+          </div>
+
+          <!-- Sección de Enlaces Interactivos detectados en la carta -->
+          <div id="note-links-container" class="note-links-container" style="display: none;">
+            <div class="note-links-heading">
+              <span class="note-links-heading-icon">🔗</span>
+              <span class="note-links-heading-title">Enlaces en esta carta:</span>
+            </div>
+            <div id="note-links-list" class="note-links-list"></div>
           </div>
         </div>
 
@@ -161,6 +186,36 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para insertar enlace -->
+  <div id="link-modal" class="link-modal-overlay" aria-hidden="true" style="display: none;">
+    <div class="link-modal-backdrop" id="link-modal-backdrop"></div>
+    <div class="link-modal-content">
+      <div class="link-modal-header">
+        <div class="link-modal-title">
+          <span class="link-modal-icon">🔗</span>
+          <h3>Añadir Enlace Web</h3>
+        </div>
+        <button id="btn-close-link-modal" class="btn-close-modal" type="button" title="Cerrar">✕</button>
+      </div>
+      <div class="link-modal-body">
+        <p class="link-modal-desc">Pega el link de una canción de Spotify, video de YouTube, fotos o cualquier página web:</p>
+        <div class="link-input-group">
+          <label for="link-url-input">Dirección web (URL) <span class="required-star">*</span></label>
+          <input type="text" id="link-url-input" class="modal-input-field" placeholder="ej: https://open.spotify.com/track/... o youtube.com/..." autocomplete="off">
+        </div>
+        <div class="link-input-group">
+          <label for="link-title-input">Texto o nombre del enlace (opcional)</label>
+          <input type="text" id="link-title-input" class="modal-input-field" placeholder="ej: Nuestra canción favorita, Ver video..." maxlength="50" autocomplete="off">
+        </div>
+        <div class="link-modal-error" id="link-modal-error" style="display: none;"></div>
+      </div>
+      <div class="link-modal-footer">
+        <button type="button" id="btn-cancel-link" class="btn-secondary-link">Cancelar</button>
+        <button type="button" id="btn-confirm-link" class="btn-primary-link">Insertar Enlace</button>
       </div>
     </div>
   </div>
@@ -194,9 +249,13 @@
             <div class="card-date">Fecha</div>
           </div>
           <div class="card-preview-count">
-            <span class="image-count-tag">
+            <span class="image-count-tag" style="display: none;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
               <span class="img-num">0</span>
+            </span>
+            <span class="link-count-tag" style="display: none;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              <span class="link-num">0</span>
             </span>
           </div>
         </div>

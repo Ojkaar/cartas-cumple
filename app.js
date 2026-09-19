@@ -61,6 +61,23 @@
   const btnCloseNote = document.getElementById('btn-close-note');
   const btnDoneNote = document.getElementById('btn-done-note');
   const btnDeleteNote = document.getElementById('btn-delete-note');
+  const btnAddLink = document.getElementById('btn-add-link');
+  const btnToggleView = document.getElementById('btn-toggle-view');
+  const viewToggleIcon = document.getElementById('view-toggle-icon');
+  const viewToggleText = document.getElementById('view-toggle-text');
+  const noteTextDisplay = document.getElementById('note-text-display');
+  const noteLinksContainer = document.getElementById('note-links-container');
+  const noteLinksList = document.getElementById('note-links-list');
+
+  // Modal para insertar enlace
+  const linkModal = document.getElementById('link-modal');
+  const linkModalBackdrop = document.getElementById('link-modal-backdrop');
+  const btnCloseLinkModal = document.getElementById('btn-close-link-modal');
+  const btnCancelLink = document.getElementById('btn-cancel-link');
+  const btnConfirmLink = document.getElementById('btn-confirm-link');
+  const linkUrlInput = document.getElementById('link-url-input');
+  const linkTitleInput = document.getElementById('link-title-input');
+  const linkModalError = document.getElementById('link-modal-error');
 
   // Selector de color
   const colorDropdownBtn = document.getElementById('color-dropdown-btn');
@@ -204,13 +221,25 @@
       titleEl.textContent = env.title.trim() || 'Sobre para Jenni';
       dateEl.textContent = formatDate(env.updatedAt);
 
-      // Contador de imágenes
-      const count = (env.images && env.images.length) || 0;
-      if (count > 0) {
-        imgNumEl.textContent = count;
-      } else {
-        const previewEl = clone.querySelector('.card-preview-count');
-        if (previewEl) previewEl.style.display = 'none';
+      // Contador de imágenes y enlaces
+      const previewEl = clone.querySelector('.card-preview-count');
+      const imageTagEl = clone.querySelector('.image-count-tag');
+      const imgCount = (env.images && env.images.length) || 0;
+      if (imgCount > 0 && imageTagEl && imgNumEl) {
+        imageTagEl.style.display = 'inline-flex';
+        imgNumEl.textContent = imgCount;
+      }
+
+      const linkTagEl = clone.querySelector('.link-count-tag');
+      const linkNumEl = clone.querySelector('.link-num');
+      const linksCount = extractLinks(env.content || '').length;
+      if (linksCount > 0 && linkTagEl && linkNumEl) {
+        linkTagEl.style.display = 'inline-flex';
+        linkNumEl.textContent = linksCount;
+      }
+
+      if (imgCount === 0 && linksCount === 0 && previewEl) {
+        previewEl.style.display = 'none';
       }
 
       // Evento de clic para abrir el sobre
@@ -248,6 +277,10 @@
     // Renderizar imágenes adjuntas
     renderImages(env.images || []);
 
+    // Restablecer modo edición y renderizar sección de enlaces
+    setReadingMode(false);
+    renderLinksSection(env.content || '');
+
     // Preparar estado del guardado
     updateSaveIndicator('Guardado');
 
@@ -283,6 +316,9 @@
 
     // Guardar cambios inmediatamente antes de cerrar
     saveCurrentDataImmediately();
+
+    // Cerrar modal de enlace si estaba abierto
+    closeLinkModal();
 
     // Animación de cierre
     noteModal.classList.remove('active');
@@ -407,6 +443,235 @@
         ${text}
       `;
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Gestión de Enlaces y Modo Lectura
+  // -------------------------------------------------------------------------
+  const URL_REGEX = /(?:https?:\/\/|www\.)[^\s<>'"`]+[^\s<>'"`.,;:!?)\]]/gi;
+
+  function extractLinks(text) {
+    if (!text) return [];
+    const matches = text.match(URL_REGEX) || [];
+    const unique = [];
+    const seen = new Set();
+    matches.forEach((m) => {
+      const lower = m.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        unique.push(m);
+      }
+    });
+    return unique;
+  }
+
+  function getLinkInfo(rawUrl, customTitle) {
+    let url = rawUrl.trim();
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url;
+    }
+
+    let domain = '';
+    try {
+      const parsed = new URL(url);
+      domain = parsed.hostname.replace(/^www\./, '');
+    } catch (e) {
+      domain = rawUrl.replace(/^https?:\/\//i, '').split('/')[0];
+    }
+
+    let title = customTitle ? customTitle.trim() : domain;
+    let icon = '🔗';
+    let category = 'Web';
+
+    if (/youtube\.com|youtu\.be/i.test(domain)) {
+      icon = '🎬';
+      if (!customTitle) title = 'YouTube';
+      category = 'Video';
+    } else if (/spotify\.com/i.test(domain)) {
+      icon = '🎵';
+      if (!customTitle) title = 'Spotify';
+      category = 'Música';
+    } else if (/instagram\.com/i.test(domain)) {
+      icon = '📸';
+      if (!customTitle) title = 'Instagram';
+      category = 'Foto / Reel';
+    } else if (/tiktok\.com/i.test(domain)) {
+      icon = '📱';
+      if (!customTitle) title = 'TikTok';
+      category = 'Video';
+    } else if (/drive\.google\.com|photos\.google\.com|dropbox\.com/i.test(domain)) {
+      icon = '📁';
+      if (!customTitle) title = 'Fotos / Archivos';
+      category = 'Nube';
+    } else if (/pinterest\.com/i.test(domain)) {
+      icon = '📌';
+      if (!customTitle) title = 'Pinterest';
+      category = 'Tablero';
+    } else if (/apple\.com\/.*music|music\.apple/i.test(domain)) {
+      icon = '🎶';
+      if (!customTitle) title = 'Apple Music';
+      category = 'Música';
+    } else if (/twitter\.com|x\.com/i.test(domain)) {
+      icon = '🐦';
+      if (!customTitle) title = 'X (Twitter)';
+      category = 'Red Social';
+    }
+
+    return { rawUrl, url, domain, title, icon, category };
+  }
+
+  function escapeHtml(str) {
+    return (str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  let isReadingMode = false;
+
+  function setReadingMode(reading) {
+    isReadingMode = reading;
+    if (!noteTextDisplay || !noteTextInput) return;
+
+    if (isReadingMode) {
+      renderFormattedContent();
+      noteTextInput.style.display = 'none';
+      noteTextDisplay.style.display = 'block';
+      if (btnToggleView) {
+        btnToggleView.classList.add('active');
+        if (viewToggleIcon) viewToggleIcon.textContent = '✏️';
+        if (viewToggleText) viewToggleText.textContent = 'Editar';
+      }
+    } else {
+      noteTextDisplay.style.display = 'none';
+      noteTextInput.style.display = 'block';
+      if (btnToggleView) {
+        btnToggleView.classList.remove('active');
+        if (viewToggleIcon) viewToggleIcon.textContent = '👁️';
+        if (viewToggleText) viewToggleText.textContent = 'Leer';
+      }
+    }
+  }
+
+  function renderFormattedContent() {
+    if (!noteTextDisplay || !noteTextInput) return;
+    const raw = noteTextInput.value;
+    if (!raw.trim()) {
+      noteTextDisplay.innerHTML = '<span style="color: #bfa993; font-style: italic;">Esta carta aún no tiene texto escrito. Haz clic en "Editar" para escribir.</span>';
+      return;
+    }
+
+    const escaped = escapeHtml(raw);
+    const withLinks = escaped.replace(URL_REGEX, (match) => {
+      const fullUrl = /^https?:\/\//i.test(match) ? match : 'https://' + match;
+      return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" class="inline-link" title="Abrir enlace en nueva pestaña">${match}</a>`;
+    });
+    noteTextDisplay.innerHTML = withLinks.replace(/\n/g, '<br>');
+  }
+
+  function renderLinksSection(content) {
+    if (!noteLinksContainer || !noteLinksList) return;
+    const links = extractLinks(content);
+
+    if (links.length === 0) {
+      noteLinksContainer.style.display = 'none';
+      noteLinksList.innerHTML = '';
+      return;
+    }
+
+    noteLinksContainer.style.display = 'block';
+    noteLinksList.innerHTML = '';
+
+    links.forEach((rawUrl) => {
+      const info = getLinkInfo(rawUrl);
+      const pill = document.createElement('a');
+      pill.href = info.url;
+      pill.target = '_blank';
+      pill.rel = 'noopener noreferrer';
+      pill.className = 'link-card-pill';
+      pill.title = `Abrir ${info.url} en nueva pestaña`;
+
+      pill.innerHTML = `
+        <div class="link-pill-main">
+          <span class="link-pill-icon">${info.icon}</span>
+          <div class="link-pill-text-col">
+            <span class="link-pill-title">${escapeHtml(info.title)}</span>
+            <span class="link-pill-url">${escapeHtml(info.url)}</span>
+          </div>
+        </div>
+        <span class="link-pill-action">
+          Abrir ↗
+        </span>
+      `;
+
+      noteLinksList.appendChild(pill);
+    });
+  }
+
+  function openLinkModal() {
+    if (!linkModal) return;
+    if (linkUrlInput) linkUrlInput.value = '';
+    if (linkTitleInput) linkTitleInput.value = '';
+    if (linkModalError) {
+      linkModalError.textContent = '';
+      linkModalError.style.display = 'none';
+    }
+    linkModal.style.display = 'flex';
+    linkModal.setAttribute('aria-hidden', 'false');
+    setTimeout(() => {
+      if (linkUrlInput) linkUrlInput.focus();
+    }, 100);
+  }
+
+  function closeLinkModal() {
+    if (!linkModal) return;
+    linkModal.style.display = 'none';
+    linkModal.setAttribute('aria-hidden', 'true');
+  }
+
+  function handleConfirmLink() {
+    const rawUrl = (linkUrlInput ? linkUrlInput.value : '').trim();
+    const title = (linkTitleInput ? linkTitleInput.value : '').trim();
+
+    if (!rawUrl) {
+      if (linkModalError) {
+        linkModalError.textContent = 'Por favor ingresa una dirección web o enlace.';
+        linkModalError.style.display = 'block';
+      }
+      return;
+    }
+
+    // Formatear URL
+    const formattedUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://' + rawUrl;
+
+    // Texto a insertar en el bloc de notas
+    const textToInsert = title ? `${title}: ${formattedUrl}` : formattedUrl;
+
+    // Si estamos en modo lectura, volvemos a modo edición para insertar
+    if (isReadingMode) {
+      setReadingMode(false);
+    }
+
+    // Insertar en la posición actual del cursor o al final
+    const start = noteTextInput.selectionStart || noteTextInput.value.length;
+    const end = noteTextInput.selectionEnd || noteTextInput.value.length;
+    const currentVal = noteTextInput.value;
+    const spacerBefore = (start > 0 && currentVal[start - 1] !== ' ' && currentVal[start - 1] !== '\n') ? ' ' : '';
+    const spacerAfter = '\n';
+
+    const newVal = currentVal.substring(0, start) + spacerBefore + textToInsert + spacerAfter + currentVal.substring(end);
+    noteTextInput.value = newVal;
+
+    closeLinkModal();
+    renderLinksSection(newVal);
+    saveCurrentDataImmediately();
+    updateSaveIndicator('Enlace guardado');
+
+    noteTextInput.focus();
+    const newPos = start + spacerBefore.length + textToInsert.length + spacerAfter.length;
+    noteTextInput.setSelectionRange(newPos, newPos);
   }
 
   // -------------------------------------------------------------------------
@@ -557,10 +822,47 @@
     // Botón eliminar sobre
     btnDeleteNote.addEventListener('click', deleteCurrentEnvelope);
 
-    // Inputs de texto con auto-guardado
+    // Inputs de texto con auto-guardado y detección de enlaces
     if (noteAuthorInput) noteAuthorInput.addEventListener('input', queueAutoSave);
     noteTitleInput.addEventListener('input', queueAutoSave);
-    noteTextInput.addEventListener('input', queueAutoSave);
+    noteTextInput.addEventListener('input', () => {
+      renderLinksSection(noteTextInput.value);
+      queueAutoSave();
+    });
+
+    // Alternar entre modo lectura (enlaces interactivos en el texto) y modo edición
+    if (btnToggleView) {
+      btnToggleView.addEventListener('click', () => {
+        setReadingMode(!isReadingMode);
+      });
+    }
+
+    // Modal para añadir enlace
+    if (btnAddLink) {
+      btnAddLink.addEventListener('click', openLinkModal);
+    }
+    if (btnCloseLinkModal) {
+      btnCloseLinkModal.addEventListener('click', closeLinkModal);
+    }
+    if (btnCancelLink) {
+      btnCancelLink.addEventListener('click', closeLinkModal);
+    }
+    if (linkModalBackdrop) {
+      linkModalBackdrop.addEventListener('click', closeLinkModal);
+    }
+    if (btnConfirmLink) {
+      btnConfirmLink.addEventListener('click', handleConfirmLink);
+    }
+    [linkUrlInput, linkTitleInput].forEach((inp) => {
+      if (inp) {
+        inp.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleConfirmLink();
+          }
+        });
+      }
+    });
 
     // Subida de imagen por input file
     imageFileInput.addEventListener('change', (e) => {
@@ -710,7 +1012,9 @@
     // Tecla Escape para cerrar modales
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (imageViewerModal.classList.contains('active')) {
+        if (linkModal && linkModal.style.display === 'flex') {
+          closeLinkModal();
+        } else if (imageViewerModal.classList.contains('active')) {
           hideImageViewer();
         } else if (shareModal && shareModal.classList.contains('active')) {
           shareModal.classList.remove('active');
