@@ -232,7 +232,11 @@
 
       const linkTagEl = clone.querySelector('.link-count-tag');
       const linkNumEl = clone.querySelector('.link-num');
-      const linksCount = extractLinks(env.content || '').length;
+      const attachedCount = (env.links && env.links.length) || 0;
+      const textLinksCount = extractLinks(env.content || '').filter(
+        (tl) => !((env.links || []).some((al) => (al.url || '').toLowerCase() === tl.toLowerCase()))
+      ).length;
+      const linksCount = attachedCount + textLinksCount;
       if (linksCount > 0 && linkTagEl && linkNumEl) {
         linkTagEl.style.display = 'inline-flex';
         linkNumEl.textContent = linksCount;
@@ -277,9 +281,9 @@
     // Renderizar imágenes adjuntas
     renderImages(env.images || []);
 
-    // Restablecer modo edición y renderizar sección de enlaces
+    // Restablecer modo edición y renderizar sección de enlaces adjuntos
     setReadingMode(false);
-    renderLinksSection(env.content || '');
+    renderLinksSection(env);
 
     // Preparar estado del guardado
     updateSaveIndicator('Guardado');
@@ -365,6 +369,7 @@
       title: 'Carta para Jenni',
       content: '',
       images: [],
+      links: [],
       theme: randomTheme,
       updatedAt: Date.now()
     };
@@ -571,11 +576,22 @@
     noteTextDisplay.innerHTML = withLinks.replace(/\n/g, '<br>');
   }
 
-  function renderLinksSection(content) {
+  function renderLinksSection(envParam) {
     if (!noteLinksContainer || !noteLinksList) return;
-    const links = extractLinks(content);
+    const env = (envParam && typeof envParam === 'object' && envParam.id)
+      ? envParam
+      : (currentEnvelopeId ? envelopes.find((e) => e.id === currentEnvelopeId) : null);
 
-    if (links.length === 0) {
+    const attachedLinks = (env && Array.isArray(env.links)) ? env.links : [];
+
+    const textContent = noteTextInput ? noteTextInput.value : (env ? env.content : '');
+    const textLinks = extractLinks(textContent || '');
+    const extraTextLinks = textLinks.filter(
+      (tl) => !attachedLinks.some((al) => (al.url || '').toLowerCase() === tl.toLowerCase())
+    );
+
+    const totalCount = attachedLinks.length + extraTextLinks.length;
+    if (totalCount === 0) {
       noteLinksContainer.style.display = 'none';
       noteLinksList.innerHTML = '';
       return;
@@ -584,26 +600,58 @@
     noteLinksContainer.style.display = 'block';
     noteLinksList.innerHTML = '';
 
-    links.forEach((rawUrl) => {
-      const info = getLinkInfo(rawUrl);
-      const pill = document.createElement('a');
-      pill.href = info.url;
-      pill.target = '_blank';
-      pill.rel = 'noopener noreferrer';
+    // Enlaces adjuntos mediante el botón "Añadir Enlace" (con botón para eliminar)
+    attachedLinks.forEach((item, index) => {
+      const info = getLinkInfo(item.url, item.title);
+      const pill = document.createElement('div');
       pill.className = 'link-card-pill';
-      pill.title = `Abrir ${info.url} en nueva pestaña`;
 
       pill.innerHTML = `
-        <div class="link-pill-main">
-          <span class="link-pill-icon">${info.icon}</span>
-          <div class="link-pill-text-col">
-            <span class="link-pill-title">${escapeHtml(info.title)}</span>
-            <span class="link-pill-url">${escapeHtml(info.url)}</span>
+        <a href="${info.url}" target="_blank" rel="noopener noreferrer" class="link-pill-link" title="Abrir ${info.url} en nueva pestaña">
+          <div class="link-pill-main">
+            <span class="link-pill-icon">${info.icon}</span>
+            <div class="link-pill-text-col">
+              <span class="link-pill-title">${escapeHtml(info.title)}</span>
+              <span class="link-pill-url">${escapeHtml(info.url)}</span>
+            </div>
           </div>
-        </div>
-        <span class="link-pill-action">
-          Abrir ↗
-        </span>
+          <span class="link-pill-action">
+            Abrir ↗
+          </span>
+        </a>
+        <button type="button" class="btn-remove-link" title="Eliminar este enlace">✕</button>
+      `;
+
+      const btnRemove = pill.querySelector('.btn-remove-link');
+      if (btnRemove) {
+        btnRemove.addEventListener('click', (e) => {
+          e.stopPropagation();
+          removeLinkAtIndex(index);
+        });
+      }
+
+      noteLinksList.appendChild(pill);
+    });
+
+    // Enlaces adicionales detectados en el texto (si los hubiera)
+    extraTextLinks.forEach((rawUrl) => {
+      const info = getLinkInfo(rawUrl);
+      const pill = document.createElement('div');
+      pill.className = 'link-card-pill';
+
+      pill.innerHTML = `
+        <a href="${info.url}" target="_blank" rel="noopener noreferrer" class="link-pill-link" title="Abrir ${info.url} en nueva pestaña">
+          <div class="link-pill-main">
+            <span class="link-pill-icon">${info.icon}</span>
+            <div class="link-pill-text-col">
+              <span class="link-pill-title">${escapeHtml(info.title)}</span>
+              <span class="link-pill-url">${escapeHtml(info.url)}</span>
+            </div>
+          </div>
+          <span class="link-pill-action">
+            Abrir ↗
+          </span>
+        </a>
       `;
 
       noteLinksList.appendChild(pill);
@@ -643,35 +691,43 @@
       return;
     }
 
-    // Formatear URL
+    if (!currentEnvelopeId) return;
+    const env = envelopes.find((e) => e.id === currentEnvelopeId);
+    if (!env) return;
+
+    // Formatear URL con https:// si no tiene protocolo
     const formattedUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://' + rawUrl;
 
-    // Texto a insertar en el bloc de notas
-    const textToInsert = title ? `${title}: ${formattedUrl}` : formattedUrl;
+    if (!env.links) env.links = [];
+    env.links.push({
+      url: formattedUrl,
+      title: title || ''
+    });
+    env.updatedAt = Date.now();
 
-    // Si estamos en modo lectura, volvemos a modo edición para insertar
-    if (isReadingMode) {
-      setReadingMode(false);
+    if (dbRef) {
+      dbRef.child(currentEnvelopeId).set(env);
     }
-
-    // Insertar en la posición actual del cursor o al final
-    const start = noteTextInput.selectionStart || noteTextInput.value.length;
-    const end = noteTextInput.selectionEnd || noteTextInput.value.length;
-    const currentVal = noteTextInput.value;
-    const spacerBefore = (start > 0 && currentVal[start - 1] !== ' ' && currentVal[start - 1] !== '\n') ? ' ' : '';
-    const spacerAfter = '\n';
-
-    const newVal = currentVal.substring(0, start) + spacerBefore + textToInsert + spacerAfter + currentVal.substring(end);
-    noteTextInput.value = newVal;
+    persistEnvelopes();
 
     closeLinkModal();
-    renderLinksSection(newVal);
-    saveCurrentDataImmediately();
-    updateSaveIndicator('Enlace guardado');
+    renderLinksSection(env);
+    updateSaveIndicator('Enlace adjuntado');
+  }
 
-    noteTextInput.focus();
-    const newPos = start + spacerBefore.length + textToInsert.length + spacerAfter.length;
-    noteTextInput.setSelectionRange(newPos, newPos);
+  function removeLinkAtIndex(index) {
+    if (!currentEnvelopeId) return;
+    const env = envelopes.find((e) => e.id === currentEnvelopeId);
+    if (!env || !env.links) return;
+
+    env.links.splice(index, 1);
+    env.updatedAt = Date.now();
+    if (dbRef) {
+      dbRef.child(currentEnvelopeId).set(env);
+    }
+    persistEnvelopes();
+    renderLinksSection(env);
+    updateSaveIndicator('Enlace eliminado');
   }
 
   // -------------------------------------------------------------------------
@@ -826,7 +882,7 @@
     if (noteAuthorInput) noteAuthorInput.addEventListener('input', queueAutoSave);
     noteTitleInput.addEventListener('input', queueAutoSave);
     noteTextInput.addEventListener('input', () => {
-      renderLinksSection(noteTextInput.value);
+      renderLinksSection();
       queueAutoSave();
     });
 

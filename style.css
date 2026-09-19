@@ -1511,16 +1511,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.5rem;
   background: #ffffff;
   border: 1px solid #ffd5e2;
   border-radius: 10px;
-  padding: 0.55rem 0.85rem;
-  text-decoration: none;
-  color: #3b2c25;
+  padding: 0.45rem 0.75rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
 }
 
 .link-card-pill:hover {
@@ -1528,6 +1525,35 @@ body {
   border-color: #ffabc8;
   box-shadow: 0 5px 15px rgba(255, 171, 200, 0.35);
   background: #fffafd;
+}
+
+.link-pill-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: #3b2c25;
+}
+
+.btn-remove-link {
+  background: transparent;
+  border: none;
+  color: #bfa99b;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-remove-link:hover {
+  background: #ffe3e3;
+  color: #b52a2a;
 }
 
 .link-pill-main {
