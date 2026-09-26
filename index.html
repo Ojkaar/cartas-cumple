@@ -26,6 +26,15 @@
             <span class="pulse-dot"></span>
             <span class="status-text">Buzón en Vivo</span>
           </div>
+          <button id="btn-download-album" class="btn-secondary-header" title="Descargar todas las cartas en un álbum PDF de recuerdo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              <line x1="12" y1="6" x2="12" y2="12"></line>
+              <line x1="9" y1="9" x2="15" y2="9"></line>
+            </svg>
+            <span>Descargar Álbum (PDF)</span>
+          </button>
           <button id="btn-new-envelope" class="btn-primary" title="Escribir una nueva carta para Jenni">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span>+ Escribir Carta</span>
@@ -103,6 +112,16 @@
               <button type="button" class="tool-btn view-toggle-btn" id="btn-toggle-view" title="Alternar entre modo lectura y edición">
                 <span id="view-toggle-icon">👁️</span>
                 <span id="view-toggle-text">Leer</span>
+              </button>
+
+              <!-- Descargar carta como imagen -->
+              <button type="button" class="tool-btn download-note-btn" id="btn-download-note" title="Descargar esta carta como imagen (PNG) para guardarla o imprimirla">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Descargar Carta</span>
               </button>
 
               <!-- Color del sobre -->
@@ -223,10 +242,23 @@
   <!-- Modal para ver imagen ampliada / zoom -->
   <div id="image-viewer-modal" class="image-viewer-overlay">
     <div class="image-viewer-content">
-      <button id="btn-close-image-viewer" class="btn-close-viewer">✕</button>
+      <button id="btn-close-image-viewer" class="btn-close-viewer" title="Cerrar">✕</button>
       <img id="image-viewer-img" src="" alt="Imagen ampliada">
+      <div class="image-viewer-toolbar">
+        <button id="btn-download-viewer-image" class="btn-viewer-download" title="Descargar esta foto en alta calidad">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Descargar Foto</span>
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- Toast / Notificaciones flotantes -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <!-- Plantilla oculta para crear tarjetas de sobres en la cuadrícula -->
   <template id="envelope-card-template">
@@ -267,6 +299,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   <script src="firebase-config.js"></script>
+
+  <!-- Librerías para Descarga: html2canvas y jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <!-- Librería de Confetti para celebraciones -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
